@@ -1,0 +1,60 @@
+.infrastructure-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+@keyframes color-change {
+  0%,
+  100% {
+    stroke: lightgray;
+  }
+  50% {
+    stroke: crimson;
+  }
+}
+
+.svg-wrapper {
+  padding: 5px;
+
+  svg {
+    height: 150px;
+    width: 90px;
+  }
+
+  svg * {
+    fill: crimson;
+    color: crimson;
+  }
+}
+
+.infrastructure {
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .container {
+    height: 160px;
+    width: 100px;
+    border: 2px solid slategray;
+    border-radius: 6px;
+  }
+
+  .container img {
+    height: 160px;
+    width: 100px;
+  }
+
+  .path {
+    position: absolute;
+    width: fit-content;
+
+    * {
+      // transition: all 1s;
+      animation: color-change 3s linear infinite;
+    }
+  }
+}

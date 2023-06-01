@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>window.Promise || document.write('<scr'+'ipt src="es6-promise.auto.js"></sc'+'ript>');</script>
+  <script src="bixel.js"></script>
+  <script src="jquery-1.12.4.min.js"></script>
+  <script src="common.js"></script>
+  <script src="highcharts.js"></script>
+  <script src="heatmap.js"></script>
+  <script src="treemap.js"></script>
+  <script src="exporting.js"></script>
+  <script src="export-data.js"></script>
+  <script src="accessibility.js"></script>
+  <link href="styles.css" rel="stylesheet">
+  <script>
+    var theme = document.location.href.match(/theme=(\w+)/) ? RegExp.$1 : 'dark';
+    var ts = new Date().valueOf();
+    document.write('<link href="' + theme + '.css?ts=' + ts + '" rel="stylesheet">');
+    document.getElementsByTagName('html')[0].className = theme;
+  </script>
+  <style>
+    html {
+      font: 5vmin "HeliosCondC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+      overflow: hidden;
+      background: none;
+    }
+    body {
+      color: #677689;
+    }
+    html, body, main {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+    #container {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+
+</head>
+<body>
+<main>
+  <div id="container"></div>
+</main>
+
+<script>
+  var dashlet, config;
+  bixel.init({
+    zsCount: 1,
+  }).then(function (dashlet_) {
+    dashlet = dashlet_;
+    config = dashlet.config;
+  });
+
+  function getColor(axisId, memberId) {
+    var dataSource = config.dataSource || {};
+    var style = dataSource.style || {};
+    var axisStyle = style[axisId] || {};
+    var memberStyle = axisStyle[memberId] || {};
+    var color = memberStyle.color || '#000000';
+    return color;
+  }
+
+  bixel.on('load', function (data, axes) {
+    var xs = axes.getXs();
+    var ys = axes.getYs();
+    var z = axes.getZs()[0];
+    const sectors = xs.map(x => ({x, values: ys.map(y => data.getValue(x, y, z))}));
+    const configColors = config.colors ? config.colors : ['#BFBFBF', '#A0C1DE', '#6E99D0', '#4472C4', '#03A7E4'];
+    sectors.forEach((s, i) => {
+      s.name =  s.x.title;
+      s.dataLabels = {
+        formatter: function() {
+          return this.point.name + ' (' + this.point.options.values.join(' / ') + ')';
+        }
+      };
+      s.clip = false;
+      s.color = configColors[i % configColors.length];
+      s.value = s.values[0]
+    });
+    Highcharts.chart('container', {
+      chart: {
+        backgroundColor: theme == 'dark' ? "#273445" : '#fff',
+      },
+      colorAxis:  {
+        visible: false
+        //minColor: Highcharts.getOptions().colors[0],
+        //maxColor: Highcharts.getOptions().colors[Highcharts.getOptions().colors.length - 1]
+      },
+      tooltip: {
+        formatter: function() {
+          return this.point.name + ' (' + this.point.options.values.join(' / ') + ')';
+        }
+      },
+      series: [{
+        type: "treemap",
+        layoutAlgorithm: config.layoutAlgorithm ? config.layoutAlgorithm : 'squarified',
+        point: {
+          events: {
+            mouseOver: function (){
+              this.graphic.attr({ 'stroke': '#e6e6e6'});
+            },
+            mouseOut: function (){
+              this.graphic.attr({ 'stroke': theme == 'dark' ? "#273445" : '#fff'});
+            }
+          }
+        },
+        dataLabels: {
+          style: {
+            shadow: false,
+          },
+          useHTML: true
+        },
+        levels: [{
+          level: 1,
+          borderColor: theme == 'dark' ? "#273445" : '#fff'
+        }],
+        data: sectors
+      }],
+      exporting: {
+        enabled: false
+      },
+      title: {
+        text: '',
+        margin: 0
+      },
+      credits: {
+        enabled: false
+      }
+    });
+  });
+
+  bixel.on('loading', function (axes) {
+    console.log(axes);
+  });
+
+  bixel.on('no-data', function (axes) {
+    console.log(axes);
+    debugger;
+  });
+
+</script>
+
+</body>
+</html>
+
+
+
+

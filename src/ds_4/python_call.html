@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html class="FrameHtml">
+
+<head>
+    <meta charset="utf-8" />
+    <script>window.Promise || document.write('<scr' + 'ipt src="es6-promise.auto.js"></sc' + 'ript>');</script>
+    <script src="bixel.js"></script>
+    <script src="jquery-1.12.4.min.js"></script>
+    <style>
+      .FrameHtml {
+        height: 85%;
+      }
+
+      .FrameHtml > body,
+      .FrameHtml main {
+        height: 100%;
+      }
+
+     .Column {
+        display: flex;
+        align-items: center;
+        flex-direction: row-reverse;
+        height: 100%;
+        transition: all 0.5s;
+      }
+
+     .Column__Bg {
+       position: relative;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       height: 100%;
+       width: 90%;
+       /*background-image: url(./fruit.svg);*/
+       background-image: none !important;
+       background-size: 20px 20px;
+       margin-bottom: 1rem;
+     }
+
+     .Column__Value {
+       position: absolute;
+       bottom: 0;
+       left: 0;
+       width: 0%;
+       height: 100%;
+
+       transition-duration: 1s;
+       transition-property: transform, rotateY;
+       transform: translate(-100%, 0);
+
+       transition: all 1s;
+     }
+
+
+      @keyframes slidein {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+      .Column__ValueBackground {
+        filter: hue-rotate(251deg) brightness(0.8) saturate(0.8);
+        background-image: url(./fruit.svg);
+        background-size: 20px 20px;
+        border-left: 2px solid rgb(255, 0, 0);
+        border-top: 2px solid rgb(255, 0, 0);
+        border-bottom: 2px solid rgb(255, 0, 0);
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+
+        position: absolute;
+        top:0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        animation-duration: 3s;
+        animation-name: slidein;
+      }
+
+     .Column__Badge {
+       text-align: center;
+       font-weight: 800;
+       width: 10rem;
+       overflow: hidden;
+       text-overflow: ellipsis;
+       z-index:1000;
+     }
+
+     .Charts .Column__Value {
+       transform: translate(0%, 0);
+     }
+
+     .Column__GreyBackground {
+       position: absolute;
+        left: 0;
+       top: 0;
+       right: 0;
+       bottom: 0;
+       filter: opacity(0.3) grayscale(1);
+       background-image: url(./fruit.svg);
+       background-size: 20px 20px;
+       border-right: 2px solid rgb(255, 0, 0);
+       border-top: 2px solid rgb(255, 0, 0);
+       border-bottom: 2px solid rgb(255, 0, 0);
+       border-radius: 8px;
+     }
+
+    </style>
+    <!--=<script src="/axios.js"></script>
+  <script src="/react.js"></script>-->
+
+</head>
+
+<body>
+    <main>
+        <div id="container" style="display: flex; flex-direction: column; justify-content: space-around; width: 96%; height: 100%">
+<!--          <div class="Column" style="height: 40%;">-->
+<!--            <div class="Column__Bg" style="background-image: url(./fruit.svg);">-->
+<!--              <div class="Column__Badge">${json[key]}</div>-->
+<!--              <div class="Column__Value" style="width: 40%"></div>-->
+<!--            </div>-->
+<!--            <div class="Column__Badge">${key}</div>-->
+<!--          </div>-->
+<!--          <div class="Column" style="height: 40%;">-->
+<!--            <div class="Column__Bg" style="background-image: url(./fruit.svg);">-->
+<!--              <div class="Column__Badge">${json[key]}</div>-->
+<!--              <div class="Column__Value" style="width: 40%"></div>-->
+<!--            </div>-->
+<!--            <div class="Column__Badge">${kkkkkkkkkkkkkkkkkkkk}</div>-->
+<!--          </div>-->
+        </div>
+    </main>
+
+    <script>
+        /*const MyDash = () => {
+            const [value, setValue] = useState(0);
+            useEffect(() => {
+              axios.get('/databoring/python_test').then(v => setValue(v))
+            })
+            //var chartDom = document.getElementById('container');
+
+            return <div> {value} </div>;
+        };*/
+
+
+        var dashlet, config;
+        bixel.init({
+            zsCount: 1,
+        }).then(function (dashlet_) {
+            dashlet = dashlet_;
+            config = dashlet.config;
+        });
+
+        const chartDom = document.getElementById('container');
+
+        const bg = {
+          'Апельсины': './orange.svg',
+          'Яблоки': './apple.svg',
+          'Груши': './pears.svg',
+          'Сливы': './plums.svg',
+          'Вишня': './cherry.svg',
+        }
+
+        bixel.on('load', function (data, axes) {
+            console.log("DATA " +data);
+
+            $.get("/databoring/python_test", function (data) {
+              const chartDom = document.getElementById('container');
+              const json = JSON.parse(data);
+
+              const dataKeys = Object.keys(json);
+              const height = 70 / dataKeys.length;
+              const width = Math.max(...Object.values(json));
+              dataKeys.forEach(key => {
+                  chartDom.innerHTML += `
+                                        <div class="Column" style="height:${height}%;">
+                                            <div class="Column__Bg" style="">
+                                                <div class="Column__Badge">${json[key]}</div>
+                                                <div class="Column__Value" style="width: ${Number(json[key]) * 100 / width}%;">
+                                                    <div class="Column__ValueBackground"
+                                                            style="background-image: url(${bg?.[key]});"></div>
+                                                </div>
+                                                <div class="Column__GreyBackground"
+                                                      style="background-image: url(${bg?.[key]});width: 100%;"></div>
+                                            </div>
+                                            <div class="Column__Badge">${key}</div>
+                                        </div>
+                                        `;
+                })
+              chartDom.classList.add('Charts')
+            });
+
+        });
+
+        bixel.on('loading', function (axes) {
+            console.log(axes);
+        });
+
+        bixel.on('no-data', function (axes) {
+            console.log(axes);
+            //debugger;
+        });
+
+
+    </script>
+
+</body>
+
+</html>
+
+
+

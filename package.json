@@ -45,11 +45,16 @@
   "homepage": "https://gito.luxms.com/luxmsbi/luxmsbi-web-internal",
   "dependencies": {
     "@react-three/drei": "^8.10.6",
+    "@tanem/svg-injector": "^10.1.50",
     "format-number-with-string": "^0.0.2",
     "iscroll": "^5.2.0",
     "jquery": "^3.6.0",
     "kerberos": "^2.0.1",
+    "react-svg": "^16.1.6",
     "three": "^0.136.0"
+  },
+  "optionalDependencies": {
+    "node-expose-sspi": "^0.1.60"
   },
   "devDependencies": {
     "@babel/cli": "7.12.10",
